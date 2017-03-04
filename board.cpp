@@ -29,7 +29,7 @@ Board *Board::copy() {
 }
 
 bool Board::occupied(int x, int y) {
-    return taken[x + 8*y];
+    return take  n[x + 8*y];
 }
 
 bool Board::get(Side side, int x, int y) {
