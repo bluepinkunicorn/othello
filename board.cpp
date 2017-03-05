@@ -29,7 +29,7 @@ Board *Board::copy() {
 }
 
 bool Board::occupied(int x, int y) {
-    return take  n[x + 8*y];
+    return taken[x + 8*y];
 }
 
 bool Board::get(Side side, int x, int y) {
@@ -71,6 +71,7 @@ bool Board::hasMoves(Side side) {
  * Returns true if a move is legal for the given side; false otherwise.
  */
 bool Board::checkMove(Move *m, Side side) {
+	//
     // Passing is only legal if you have no moves.
     if (m == nullptr) return !hasMoves(side);
 

@@ -17,6 +17,20 @@ Player::Player(Side side) {
      
      // make a board
      Board board = Board();
+     char data[64];
+     for(int i = 0; i < 64; i++)
+     {
+		 data[i] = 'l';
+		 if(i == 27 || i == 26)
+		 {
+			 data[i] = 'w';
+		 }
+		 else if(i == 28 || i == 35)
+		 {
+			 data[i] = 'b';
+		 }
+	}
+	board.setBoard(data);
      this->side = side; // keep track of which side we are this game
 }
 
@@ -29,7 +43,7 @@ Player::~Player() {
 /* Check possible moves around a given token of other player
  * 
  */
-std::vector <Move *> Player::findPossMoves(int x, int y)
+ std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
 {
 	// get a vector of empty spots around token
 	std::vector<tuple<int, int>> emptySpots;
@@ -44,11 +58,50 @@ std::vector <Move *> Player::findPossMoves(int x, int y)
 			emptySpots.push_back(std::make_tuple(y+l, x-1));
 		}
 	}
-	if ((y-1 >= 0) && !self.board.occupied(x, y-1))
+	if ((y-1 >= 0) && !this->board.occupied(x, y-1))
 	{
 		emptySpots.push_back(std::make_tuple(y-1, x));
 	}
-	if ((y+1 < 8) && !self.board.occupied(x, y+1))
+	if ((y+1 < 8) && !this->board.occupied(x, y+1))
+	{
+		emptySpots.push_back(std::make_tuple(y+1, x));
+	}
+	
+	// get a vector of possible moves
+	std::vector<tuple<int, int>> possMoves;
+	for (unsigned int i = 0; i < emptySpots.size(); i++)
+	{
+		Move * m = new Move(std::get<0>(emptySpots[i]), std::get<1>(emptySpots[i]));
+		if (this->board.checkMove(m, this->side))
+		{
+			possMoves.push_back(std::make_tuple(std::get<0>(emptySpots[i]), std::get<1>(emptySpots[i])));
+		}
+	}
+	return possMoves;
+	//
+}
+ 
+ 
+/**std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
+{
+	// get a vector of empty spots around token
+	std::vector<tuple<int, int>> emptySpots;
+	for (int l = -1; l <= 1; l++)
+	{
+		if ((y+l < 8) && (y+l >= 0) && (x+1 < 8) && !this->board.occupied(x+1, y+l))
+		{
+			emptySpots.push_back(std::make_tuple(y+l, x+1));
+		}
+		if ((y+l < 8) && (y+l >= 0) && (x-1 >= 0) && !this->board.occupied(x-1, y+l))
+		{
+			emptySpots.push_back(std::make_tuple(y+l, x-1));
+		}
+	}
+	if ((y-1 >= 0) && !this->board.occupied(x, y-1))
+	{
+		emptySpots.push_back(std::make_tuple(y-1, x));
+	}
+	if ((y+1 < 8) && !this->board.occupied(x, y+1))
 	{
 		emptySpots.push_back(std::make_tuple(y+1, x));
 	}
@@ -60,7 +113,7 @@ std::vector <Move *> Player::findPossMoves(int x, int y)
 		for (int k = -1; k <= 1; k++)
 		{
 			if ((x-l > 0) && (x-l < 8) &&
-				(y-k > 0) && (y-k < 8) && this->board.get(self.side, x-l, y-k))
+				(y-k > 0) && (y-k < 8) && this->board.get(this->side, x-l, y-k))
 			{
 				possMoves.push_back(std::make_tuple(x-l, y-k));
 			}
@@ -68,6 +121,8 @@ std::vector <Move *> Player::findPossMoves(int x, int y)
 	}
 	return possMoves;
 }
+*/
+ 
 /*
  * Compute the next move given the opponent's last move. Your AI is
  * expected to keep track of the board on its own. If this is the first move,
@@ -82,6 +137,7 @@ std::vector <Move *> Player::findPossMoves(int x, int y)
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
+	std::cerr<< "WHATZ";
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
@@ -97,8 +153,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      
 	
 	// get opposite player color
+	Side oppSide;
 	if (side == BLACK)
-	{Side oppSide = WHITE;} // is this how its done?}
+	{oppSide = WHITE;} // is this how its done?}
 	else {oppSide = BLACK;}
 
 	// add opponets move to board
@@ -119,13 +176,15 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
 	// call possMoves
 	std::vector <tuple<int, int>> possMoves;
-	std::vector <tuple<int, int>> possMovesSpecific;
-	for(int i = 0; i < possMoves.size(); i++)
+	
+	for(unsigned int i = 0; i < possSpots.size(); i++)
 	{
-		possMovesSpecific = findPossMoves();
-		for(int j = 0; j < possMoves.size(); i++)
+		int x = std::get<0>(possSpots[i]);
+		int y = std::get<1>(possSpots[i]);
+		std::vector <tuple<int, int>> possMovesSpecific = findPossMoves(x, y);
+		for(unsigned int j = 0; j < possMovesSpecific.size(); i++)
 		{
-			possMoves[i].push_back(possMovesSpecific[j]);
+			possMoves.push_back(possMovesSpecific[j]);
 		}
 	}
 	
@@ -133,16 +192,19 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	if (possMoves.size() == 0)
 	{
 		// pass
+		std::cerr<< "WHATZ up";
 		return nullptr;
+		
 	}
 	
 	else
 	{
 		//choose random move
 		int size = possMoves.size();
-		Move * move = Move(std::get<0>(possMoves[rand()%size]), std::get<0>(possMoves[rand()%size]));
+		Move * move = new Move(std::get<0>(possMoves[rand()%size]), std::get<1>(possMoves[rand()%size]));
 		// update board
 		board.doMove(move, side);
+		std::cerr<< "x=pos: " << (std::get<0>(possMoves[rand()%size])) << "y-pos:" <<  std::get<1>(possMoves[rand()%size]);
 		return move;
 	}
 }
