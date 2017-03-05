@@ -17,7 +17,7 @@ Player::Player(Side side) {
      
      // make a board
      Board board = Board();
-     this.side = side; // keep track of which side we are this game
+     this->side = side; // keep track of which side we are this game
 }
 
 /*
@@ -29,17 +29,17 @@ Player::~Player() {
 /* Check possible moves around a given token of other player
  * 
  */
-std::vector <Move *> findPossMoves(int x, int y)
+std::vector <Move *> Player::findPossMoves(int x, int y)
 {
 	// get a vector of empty spots around token
 	std::vector<tuple<int, int>> emptySpots;
 	for (int l = -1; l <= 1; l++)
 	{
-		if ((y+l < 8) && (y+l >= 0) && (x+1 < 8) && !self.board.occupied(x+1, y+l))
+		if ((y+l < 8) && (y+l >= 0) && (x+1 < 8) && !this->board.occupied(x+1, y+l))
 		{
 			emptySpots.push_back(std::make_tuple(y+l, x+1));
 		}
-		if ((y+l < 8) && (y+l >= 0) && (x-1 >= 0) && !self.board.occupied(x-1, y+l))
+		if ((y+l < 8) && (y+l >= 0) && (x-1 >= 0) && !this->board.occupied(x-1, y+l))
 		{
 			emptySpots.push_back(std::make_tuple(y+l, x-1));
 		}
@@ -60,7 +60,7 @@ std::vector <Move *> findPossMoves(int x, int y)
 		for (int k = -1; k <= 1; k++)
 		{
 			if ((x-l > 0) && (x-l < 8) &&
-				(y-k > 0) && (y-k < 8) && self.board.get(self.side, x-l, y-k))
+				(y-k > 0) && (y-k < 8) && this->board.get(self.side, x-l, y-k))
 			{
 				possMoves.push_back(std::make_tuple(x-l, y-k));
 			}
@@ -95,28 +95,54 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      // update board*
      
      
-     // compile list of spots with opposite player on it
+	
+	// get opposite player color
+	if (side == BLACK)
+	{Side oppSide = WHITE;} // is this how its done?}
+	else {oppSide = BLACK;}
+
+	// add opponets move to board
+	board.doMove(opponentsMove, oppSide);
+	
+	// compile list of spots with opposite player on it
 	std::vector <tuple<int, int>> possSpots;
-	if side == BLACK;
-	Side oppSide = white; // is this how its done?
-	else {oppSide = black;}
 	for (int i = 0; i < 9; i++)
 	{
-		for(int j =0; j < 9; j++)
+		for(int j = 0; j < 9; j++)
 		{
-			if(board.get(side, i, j))
-			{possSpots.push_back(std::make_tuple(i, j);}
+			if(board.get(oppSide, i, j))
+			{
+				possSpots.push_back(std::make_tuple(i, j));
+			}
 	   }
 	}
 
 	// call possMoves
 	std::vector <tuple<int, int>> possMoves;
 	std::vector <tuple<int, int>> possMovesSpecific;
-	for(int i=0; i < possMoves.size(); i++){
+	for(int i = 0; i < possMoves.size(); i++)
+	{
 		possMovesSpecific = findPossMoves();
-		for(int j=0; j < possMoves.size(); i++){
+		for(int j = 0; j < possMoves.size(); i++)
+		{
 			possMoves[i].push_back(possMovesSpecific[j]);
 		}
 	}
-    return nullptr;
+	
+	// check if possMoves empty
+	if (possMoves.size() == 0)
+	{
+		// pass
+		return nullptr;
+	}
+	
+	else
+	{
+		//choose random move
+		int size = possMoves.size();
+		Move * move = Move(std::get<0>(possMoves[rand()%size]), std::get<0>(possMoves[rand()%size]));
+		// update board
+		board.doMove(move, side);
+		return move;
+	}
 }
