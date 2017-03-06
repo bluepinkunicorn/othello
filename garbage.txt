@@ -1,0 +1,41 @@
+ 
+/**std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
+{
+	// get a vector of empty spots around token
+	std::vector<tuple<int, int>> emptySpots;
+	for (int l = -1; l <= 1; l++)
+	{
+		if ((y+l < 8) && (y+l >= 0) && (x+1 < 8) && !this->board.occupied(x+1, y+l))
+		{
+			emptySpots.push_back(std::make_tuple(y+l, x+1));
+		}
+		if ((y+l < 8) && (y+l >= 0) && (x-1 >= 0) && !this->board.occupied(x-1, y+l))
+		{
+			emptySpots.push_back(std::make_tuple(y+l, x-1));
+		}
+	}
+	if ((y-1 >= 0) && !this->board.occupied(x, y-1))
+	{
+		emptySpots.push_back(std::make_tuple(y-1, x));
+	}
+	if ((y+1 < 8) && !this->board.occupied(x, y+1))
+	{
+		emptySpots.push_back(std::make_tuple(y+1, x));
+	}
+	
+	// get a vector of possible moves
+	std::vector<tuple<int, int>> possMoves;
+	for (int l = -1; l <= 1; l++)
+	{
+		for (int k = -1; k <= 1; k++)
+		{
+			if ((x-l > 0) && (x-l < 8) &&
+				(y-k > 0) && (y-k < 8) && this->board.get(this->side, x-l, y-k))
+			{
+				possMoves.push_back(std::make_tuple(x-l, y-k));
+			}
+		}
+	}
+	return possMoves;
+}
+*/

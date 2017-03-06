@@ -16,7 +16,7 @@ Player::Player(Side side) {
      */
      
      // make a board
-     Board board = Board();
+    /** Board board = Board();
      char data[64];
      for(int i = 0; i < 64; i++)
      {
@@ -32,6 +32,7 @@ Player::Player(Side side) {
 	}
 	board.setBoard(data);
      this->side = side; // keep track of which side we are this game
+     */
 }
 
 /*
@@ -43,79 +44,19 @@ Player::~Player() {
 /* Check possible moves around a given token of other player
  * 
  */
- std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
+/**
+ * std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
 {
-	// get a vector of empty spots around token
-	std::vector<tuple<int, int>> emptySpots;
-	for (int l = -1; l <= 1; l++)
-	{
-		if ((y+l < 8) && (y+l >= 0) && (x+1 < 8) && !this->board.occupied(x+1, y+l))
-		{
-			emptySpots.push_back(std::make_tuple(y+l, x+1));
-		}
-		if ((y+l < 8) && (y+l >= 0) && (x-1 >= 0) && !this->board.occupied(x-1, y+l))
-		{
-			emptySpots.push_back(std::make_tuple(y+l, x-1));
-		}
-	}
-	if ((y-1 >= 0) && !this->board.occupied(x, y-1))
-	{
-		emptySpots.push_back(std::make_tuple(y-1, x));
-	}
-	if ((y+1 < 8) && !this->board.occupied(x, y+1))
-	{
-		emptySpots.push_back(std::make_tuple(y+1, x));
-	}
 	
-	// get a vector of possible moves
 	std::vector<tuple<int, int>> possMoves;
-	for (unsigned int i = 0; i < emptySpots.size(); i++)
+	for (int i = -1; i <= 1; i++)
 	{
-		Move * m = new Move(std::get<0>(emptySpots[i]), std::get<1>(emptySpots[i]));
-		if (this->board.checkMove(m, this->side))
+		for (int j = -1; j <= 1; j++)
 		{
-			possMoves.push_back(std::make_tuple(std::get<0>(emptySpots[i]), std::get<1>(emptySpots[i])));
-		}
-	}
-	return possMoves;
-	//
-}
- 
- 
-/**std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
-{
-	// get a vector of empty spots around token
-	std::vector<tuple<int, int>> emptySpots;
-	for (int l = -1; l <= 1; l++)
-	{
-		if ((y+l < 8) && (y+l >= 0) && (x+1 < 8) && !this->board.occupied(x+1, y+l))
-		{
-			emptySpots.push_back(std::make_tuple(y+l, x+1));
-		}
-		if ((y+l < 8) && (y+l >= 0) && (x-1 >= 0) && !this->board.occupied(x-1, y+l))
-		{
-			emptySpots.push_back(std::make_tuple(y+l, x-1));
-		}
-	}
-	if ((y-1 >= 0) && !this->board.occupied(x, y-1))
-	{
-		emptySpots.push_back(std::make_tuple(y-1, x));
-	}
-	if ((y+1 < 8) && !this->board.occupied(x, y+1))
-	{
-		emptySpots.push_back(std::make_tuple(y+1, x));
-	}
-	
-	// get a vector of possible moves
-	std::vector<tuple<int, int>> possMoves;
-	for (int l = -1; l <= 1; l++)
-	{
-		for (int k = -1; k <= 1; k++)
-		{
-			if ((x-l > 0) && (x-l < 8) &&
-				(y-k > 0) && (y-k < 8) && this->board.get(this->side, x-l, y-k))
+			Move m = Move(x+i, y+j);
+			if (this->board.checkMove(&m, this->side))
 			{
-				possMoves.push_back(std::make_tuple(x-l, y-k));
+				possMoves.push_back(std::make_tuple(x+i, y+j));
 			}
 		}
 	}
@@ -137,7 +78,8 @@ Player::~Player() {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-	std::cerr<< "WHATZ";
+	
+	//std::cerr<< "WHATZ";
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
@@ -150,30 +92,44 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      // choose random entry or return nullptr*
      // update board*
      
-     
 	
 	// get opposite player color
+	/*
 	Side oppSide;
-	if (side == BLACK)
-	{oppSide = WHITE;} // is this how its done?}
-	else {oppSide = BLACK;}
-
-	// add opponets move to board
-	board.doMove(opponentsMove, oppSide);
+	oppSide = WHITE;
+	if (this->side == BLACK)
+	{
+		oppSide = WHITE;
+	}
+	else 
+	{
+		oppSide = BLACK;
+	}
+	* */
 	
+	// add opponent's move to board
+	//board.doMove(opponentsMove, oppSide);	
 	// compile list of spots with opposite player on it
-	std::vector <tuple<int, int>> possSpots;
+	//std::vector <std::tuple<int, int>> possSpots;
+	std::vector<int> *test = new std::vector<int>();
+	//test->reserve(4);
+	//test.insert(test.begin(), 5);
+	/*
 	for (int i = 0; i < 9; i++)
 	{
 		for(int j = 0; j < 9; j++)
 		{
-			if(board.get(oppSide, i, j))
-			{
-				possSpots.push_back(std::make_tuple(i, j));
-			}
+			//if(board.get(oppSide, i, j))
+			//{
+				//std::tuple<int, int> ij = std::make_tuple(i, j);
+				//possSpots.push_back(ij);
+			//}
 	   }
 	}
-
+	* */
+	
+	
+	/**
 	// call possMoves
 	std::vector <tuple<int, int>> possMoves;
 	
@@ -182,7 +138,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		int x = std::get<0>(possSpots[i]);
 		int y = std::get<1>(possSpots[i]);
 		std::vector <tuple<int, int>> possMovesSpecific = findPossMoves(x, y);
-		for(unsigned int j = 0; j < possMovesSpecific.size(); i++)
+		for(unsigned int j = 0; j < possMovesSpecific.size(); j++)
 		{
 			possMoves.push_back(possMovesSpecific[j]);
 		}
@@ -192,9 +148,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	if (possMoves.size() == 0)
 	{
 		// pass
-		std::cerr<< "WHATZ up";
-		return nullptr;
-		
+		return nullptr;		
 	}
 	
 	else
@@ -204,7 +158,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		Move * move = new Move(std::get<0>(possMoves[rand()%size]), std::get<1>(possMoves[rand()%size]));
 		// update board
 		board.doMove(move, side);
-		std::cerr<< "x=pos: " << (std::get<0>(possMoves[rand()%size])) << "y-pos:" <<  std::get<1>(possMoves[rand()%size]);
 		return move;
 	}
+	*/
+	return nullptr;
 }

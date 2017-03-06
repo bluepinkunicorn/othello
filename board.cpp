@@ -71,7 +71,7 @@ bool Board::hasMoves(Side side) {
  * Returns true if a move is legal for the given side; false otherwise.
  */
 bool Board::checkMove(Move *m, Side side) {
-	//
+	
     // Passing is only legal if you have no moves.
     if (m == nullptr) return !hasMoves(side);
 
