@@ -16,12 +16,12 @@ Player::Player(Side side) {
      */
      
      // make a board
-    /** Board board = Board();
-     char data[64];
-     for(int i = 0; i < 64; i++)
-     {
+    Board board = Board();
+    char data[64];
+    for(int i = 0; i < 64; i++)
+    {
 		 data[i] = 'l';
-		 if(i == 27 || i == 26)
+		 if(i == 27 || i == 36)
 		 {
 			 data[i] = 'w';
 		 }
@@ -31,8 +31,8 @@ Player::Player(Side side) {
 		 }
 	}
 	board.setBoard(data);
-     this->side = side; // keep track of which side we are this game
-     */
+    this->side = side; // keep track of which side we are this game
+     
 }
 
 /*
@@ -46,7 +46,7 @@ Player::~Player() {
  */
 std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
 {
-	
+	// std::cerr << "x: " << x << " y: " << y << std::endl;
 	std::vector<tuple<int, int>> possMoves;
 	for (int i = -1; i <= 1; i++)
 	{
@@ -55,6 +55,7 @@ std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
 			Move m = Move(x+i, y+j);
 			if (this->board.checkMove(&m, this->side))
 			{
+				// std::cerr << "possible: x: " << x+i << " y: " << y << std::endl;
 				possMoves.push_back(std::make_tuple(x+i, y+j));
 			}
 		}
@@ -77,7 +78,6 @@ std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	
-	//std::cerr<< "WHATZ";
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
@@ -92,8 +92,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      
 	
 	// get opposite player color
+	std::cerr << "A" << std::endl;
 	Side oppSide;
-	oppSide = WHITE;
 	if (this->side == BLACK)
 	{
 		oppSide = WHITE;
@@ -103,36 +103,48 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		oppSide = BLACK;
 	}
 	
+	std::cerr << "B" << std::endl;
+
 	// add opponent's move to board
 	board.doMove(opponentsMove, oppSide);	
 	// compile list of spots with opposite player on it
 	std::vector <std::tuple<int, int>> possSpots;
-	for (int i = 0; i < 9; i++)
+	// std::cerr << "Spots with opposite player " << oppSide << ":" << std::endl;
+	
+	std::cerr << "C" << std::endl;
+	for (int i = 0; i < 8; i++)
 	{
-		for(int j = 0; j < 9; j++)
+		for(int j = 0; j < 8; j++)
 		{
 			if(board.get(oppSide, i, j))
 			{
+				// std::cerr << "x: " << i << " y: " << j << std::endl;
 				std::tuple<int, int> ij = std::make_tuple(i, j);
 				possSpots.push_back(ij);
 			}
 	   }
 	}
-	
+	// std::cerr << std::endl;
+	std::cerr << "D" << std::endl;
 	
 	// call possMoves
 	std::vector <tuple<int, int>> possMoves;
-	
+	std::cerr << "possSpots's size: " << possSpots.size() << std::endl;
 	for(unsigned int i = 0; i < possSpots.size(); i++)
 	{
+		std::cerr << "i: " << i << std::endl;
 		int x = std::get<0>(possSpots[i]);
 		int y = std::get<1>(possSpots[i]);
 		std::vector <tuple<int, int>> possMovesSpecific = findPossMoves(x, y);
+		std::cerr << "possMovesSpecific.size(): " << possMovesSpecific.size() << std::endl;
 		for(unsigned int j = 0; j < possMovesSpecific.size(); j++)
 		{
+			std::cerr << "	" << j << std::endl;
 			possMoves.push_back(possMovesSpecific[j]);
 		}
 	}
+	std::cerr << "E" << std::endl;
+
 	
 	// check if possMoves empty
 	if (possMoves.size() == 0)
@@ -140,16 +152,24 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		// pass
 		return nullptr;		
 	}
-	
 	else
 	{
 		//choose random move
 		int size = possMoves.size();
-		Move * move = new Move(std::get<0>(possMoves[rand()%size]), std::get<1>(possMoves[rand()%size]));
+		int index = rand() % size;
+		Move * move = new Move(std::get<0>(possMoves[index]), std::get<1>(possMoves[index]));
 		// update board
-		board.doMove(move, side);
+		board.doMove(move, this->side);
+		if (this->side == BLACK)
+		{
+			std::cerr << "side: BLACK" << std::endl;
+		}
+		else
+		{
+			std::cerr << "side: WHITE" << std::endl;
+		}
+		std::cerr << "move: (x,y) = " << std::get<0>(possMoves[index]) << std::get<1>(possMoves[index]) << std::endl;
+		std::cerr << std::endl;
 		return move;
 	}
-	
-	return nullptr;
 }
