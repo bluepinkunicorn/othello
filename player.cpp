@@ -44,8 +44,7 @@ Player::~Player() {
 /* Check possible moves around a given token of other player
  * 
  */
-/**
- * std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
+std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
 {
 	
 	std::vector<tuple<int, int>> possMoves;
@@ -62,7 +61,6 @@ Player::~Player() {
 	}
 	return possMoves;
 }
-*/
  
 /*
  * Compute the next move given the opponent's last move. Your AI is
@@ -94,7 +92,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      
 	
 	// get opposite player color
-	/*
 	Side oppSide;
 	oppSide = WHITE;
 	if (this->side == BLACK)
@@ -105,31 +102,24 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	{
 		oppSide = BLACK;
 	}
-	* */
 	
 	// add opponent's move to board
-	//board.doMove(opponentsMove, oppSide);	
+	board.doMove(opponentsMove, oppSide);	
 	// compile list of spots with opposite player on it
-	//std::vector <std::tuple<int, int>> possSpots;
-	std::vector<int> *test = new std::vector<int>();
-	//test->reserve(4);
-	//test.insert(test.begin(), 5);
-	/*
+	std::vector <std::tuple<int, int>> possSpots;
 	for (int i = 0; i < 9; i++)
 	{
 		for(int j = 0; j < 9; j++)
 		{
-			//if(board.get(oppSide, i, j))
-			//{
-				//std::tuple<int, int> ij = std::make_tuple(i, j);
-				//possSpots.push_back(ij);
-			//}
+			if(board.get(oppSide, i, j))
+			{
+				std::tuple<int, int> ij = std::make_tuple(i, j);
+				possSpots.push_back(ij);
+			}
 	   }
 	}
-	* */
 	
 	
-	/**
 	// call possMoves
 	std::vector <tuple<int, int>> possMoves;
 	
@@ -160,6 +150,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		board.doMove(move, side);
 		return move;
 	}
-	*/
+	
 	return nullptr;
 }
