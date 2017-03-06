@@ -46,16 +46,17 @@ Player::~Player() {
  */
 std::vector <tuple<int, int>> Player::findPossMoves(int x, int y)
 {
-	// std::cerr << "x: " << x << " y: " << y << std::endl;
+	std::cerr << "x: " << x << " y: " << y << std::endl;
 	std::vector<tuple<int, int>> possMoves;
 	for (int i = -1; i <= 1; i++)
 	{
 		for (int j = -1; j <= 1; j++)
 		{
 			Move m = Move(x+i, y+j);
-			if (this->board.checkMove(&m, this->side))
+			if (x+i >= 0 && x+i < 8 && y+j >= 0 && y+j < 8 && 
+				this->board.checkMove(&m, this->side))
 			{
-				// std::cerr << "possible: x: " << x+i << " y: " << y << std::endl;
+				std::cerr << "possible: x: " << x+i << " y: " << y << std::endl;
 				possMoves.push_back(std::make_tuple(x+i, y+j));
 			}
 		}
