@@ -17,6 +17,9 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
     std::vector <tuple<int, int>>findPossMoves(int x, int y);
+    bool isCornerPiece(int x, int y);
+    bool isEdgePiece(int x, int y);
+    bool whiteCanMove(Move *opponentsMove, Board *tempBoard);
     
 
     // Flag to tell if the player is running within the test_minimax context
