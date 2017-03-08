@@ -77,6 +77,11 @@ bool Player::isEdgePiece(int x, int y)
 {
 	return x == 0 || y == 0 || x == 7 || y == 7;
 }
+
+bool Player::is_oppiCorner(int x, int y)
+{
+        return (x == 1 && y == 1) || (x == 6 && y == 6) || (x == 1 && y == 6) || (x == 6 && y == 1);
+}
  
 /*
  * Compute the next move given the opponent's last move. Your AI is
@@ -159,16 +164,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		bool check = false;
 		for (unsigned int i = 0; i < possMoves.size(); i++)
 		{
-			this->board.copy();
-			Board *tempBoard = this->board.copy();
-			Move *tempMove = new Move(std::get<0>(possMoves[i]), std::get<1>(possMoves[i]));
-			if (!whiteCanMove(tempMove, tempBoard))
-			{
-				bestX = std::get<0>(possMoves[i]);
-				bestY = std::get<1>(possMoves[i]);
-				check = true;
-			}
-			else if (isEdgePiece(std::get<0>(possMoves[i]), std::get<1>(possMoves[i])))
+			if (isEdgePiece(std::get<0>(possMoves[i]), std::get<1>(possMoves[i])))
 			{
 				bestX = std::get<0>(possMoves[i]);
 				bestY = std::get<1>(possMoves[i]);

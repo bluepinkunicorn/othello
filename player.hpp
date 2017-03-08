@@ -20,6 +20,7 @@ public:
     bool isCornerPiece(int x, int y);
     bool isEdgePiece(int x, int y);
     bool whiteCanMove(Move *opponentsMove, Board *tempBoard);
+    bool is_oppiCorner(int x, int y);
     
 
     // Flag to tell if the player is running within the test_minimax context
