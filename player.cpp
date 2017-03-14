@@ -80,7 +80,72 @@ bool Player::isEdgePiece(int x, int y)
 
 bool Player::is_oppiCorner(int x, int y)
 {
-        return (x == 1 && y == 1) || (x == 6 && y == 6) || (x == 1 && y == 6) || (x == 6 && y == 1);
+    return (x == 1 && y == 1) || (x == 6 && y == 6) || (x == 1 && y == 6) || (x == 6 && y == 1);
+}
+
+bool Player::is_adjCorner(int x, int y)
+{
+	return (x == 1 && y == 0) || (x == 0 && y == 1) || (x == 6 && y == 0) || (x == 7 && y == 1) || (x == 0 && y == 6) ||
+		   (x == 1 && y == 7) || (x == 6 && y == 7) || (x == 7 && x == 6);
+}
+
+Move *Player::choose_bestMove(std::vector<tuple<int, int>> possMoves)
+{
+	vector<int> scores(64);
+	for (int i = 0; i < 64; i++)
+	{
+		scores[i] = 0;
+	}
+	for (unsigned int i = 0; i < possMoves.size(); i++)
+	{
+		int x_pos = std::get<0>(possMoves[i]);
+		int y_pos = std::get<1>(possMoves[i]);
+		if (isCornerPiece(x_pos, y_pos))
+		{
+			scores[x_pos+8*y_pos] = 300;
+		}
+		else if (is_oppiCorner(x_pos, y_pos))
+		{
+			scores[x_pos+8*y_pos] = -500;
+		}
+		else if (is_adjCorner(x_pos, y_pos))
+		{
+			scores[x_pos+8*y_pos] = -30;
+		}
+		else if (isEdgePiece(x_pos, y_pos))
+		{
+			scores[x_pos+8*y_pos] = 2000;
+		}
+		Side oppSide;
+		if (this->side == BLACK)
+		{
+			oppSide = WHITE;
+		}
+		else 
+		{
+			oppSide = BLACK;
+		}
+		Move *move = new Move(x_pos, y_pos);
+		scores[x_pos+8*y_pos] += delta_WhitePieces(move, this->board.copy(), oppSide);
+	}
+
+	int index_maxscore = std::get<0>(possMoves[0]) + 8*std::get<1>(possMoves[0]);
+	int x_max = std::get<0>(possMoves[0]);
+	int y_max = std::get<1>(possMoves[0]);
+	for (unsigned int i = 0; i < possMoves.size(); i++)
+	{
+		int x_pos = std::get<0>(possMoves[i]);
+		int y_pos = std::get<1>(possMoves[i]);
+		int index = x_pos + 8*y_pos;
+		if (scores[index] > scores[index_maxscore])
+		{
+			index_maxscore = index;
+			x_max = x_pos;
+			y_max = y_pos;
+		}
+	}
+	Move * move = new Move(x_max, y_max);
+	return move;
 }
  
 /*
@@ -160,86 +225,43 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
 	else
 	{
-		int bestX, bestY;
-		bool check = false;
-		for (unsigned int i = 0; i < possMoves.size(); i++)
-		{
-			if (isEdgePiece(std::get<0>(possMoves[i]), std::get<1>(possMoves[i])))
-			{
-				bestX = std::get<0>(possMoves[i]);
-				bestY = std::get<1>(possMoves[i]);
-				check = true;
-			}
-			else if (isCornerPiece(std::get<0>(possMoves[i]), std::get<1>(possMoves[i])))
-			{
-				bestX = std::get<0>(possMoves[i]);
-				bestY = std::get<1>(possMoves[i]);
-				check = true;
-			}
-		}
-		if (check)
-		{
-			Move * move = new Move(bestX, bestY);
-			board.doMove(move, this->side);
-			return move;
-		}
-		else
-		{
-			//choose random move
-			int size = possMoves.size();
-			int index = rand() % size;
-			Move * move = new Move(std::get<0>(possMoves[index]), std::get<1>(possMoves[index]));
-			board.doMove(move, this->side);
-			return move;
-		}
+		Move * move = choose_bestMove(possMoves);
+		board.doMove(move, this->side);
+		return move;
 	}
 }
 
 /**
  * Check if WHITE can make a move given BLACK's most recent move.
  */
-bool Player::whiteCanMove(Move *opponentsMove, Board *tempBoard) {
+int Player::delta_WhitePieces(Move *move, Board *tempBoard, Side oppSide) {
 
-	// this side is white
-	Side oppSide = BLACK;
+	// we are oppSide (black = oppSide)
 	
-	// add BLACK's move to board
-	tempBoard->doMove(opponentsMove, oppSide);	
-	// compile list of spots with opposite player on it
-	std::vector <std::tuple<int, int>> possSpots;
-	
-	for (int i = 0; i < 8; i++)
+	// count how many this->side pieces are on the board
+	int initialCount;
+	if (oppSide == WHITE)
 	{
-		for(int j = 0; j < 8; j++)
-		{
-			if(tempBoard->get(oppSide, i, j))
-			{
-				std::tuple<int, int> ij = std::make_tuple(i, j);
-				possSpots.push_back(ij);
-			}
-	   }
-	}
-	
-	// call possMoves
-	std::vector <tuple<int, int>> possMoves;
-	for(unsigned int i = 0; i < possSpots.size(); i++)
-	{
-		int x = std::get<0>(possSpots[i]);
-		int y = std::get<1>(possSpots[i]);
-		std::vector <tuple<int, int>> possMovesSpecific = findPossMoves(x, y);
-		for(unsigned int j = 0; j < possMovesSpecific.size(); j++)
-		{
-			possMoves.push_back(possMovesSpecific[j]);
-		}
-	}
-	
-	// check if possMoves empty
-	if (possMoves.size() == 0)
-	{
-		return false;		
+		initialCount = tempBoard->countWhite();
 	}
 	else
 	{
-		return true;
+		initialCount = tempBoard->countBlack();
 	}
+
+	// add our move to board
+	tempBoard->doMove(move, this->side);
+
+	int finalCount;
+	if (oppSide == WHITE)
+	{
+		finalCount = tempBoard->countWhite();
+	}
+	else
+	{
+		finalCount = tempBoard->countBlack();
+	}
+	int delta = finalCount - initialCount;
+	return delta;
 }
+

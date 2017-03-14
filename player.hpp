@@ -19,8 +19,10 @@ public:
     std::vector <tuple<int, int>>findPossMoves(int x, int y);
     bool isCornerPiece(int x, int y);
     bool isEdgePiece(int x, int y);
-    bool whiteCanMove(Move *opponentsMove, Board *tempBoard);
+    bool is_adjCorner(int x, int y);
     bool is_oppiCorner(int x, int y);
+    Move *choose_bestMove(std::vector<tuple<int, int>> possMoves);
+    int delta_WhitePieces(Move *move, Board *tempBoard, Side oppSide);
     
 
     // Flag to tell if the player is running within the test_minimax context
